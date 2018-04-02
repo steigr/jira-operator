@@ -1,0 +1,10 @@
+resource:
+  name: history
+  namespace: default
+  spec:
+    ingress:
+      hostname: jira.sandbox
+    image:
+      variant: core
+    storage:
+      class: local-disk

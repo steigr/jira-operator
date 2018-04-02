@@ -1,9 +1,12 @@
+{{- $app := printf "%s-jira" .Values.resource.name -}}
+{{- $spec := dict }}
+{{- $_ := merge $spec .Values.resource.spec .Values.default -}}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{ .Values.resource.name }}-hello
+  name: {{ $app }}
   labels:
-    app: {{ .Values.resource.name }}-hello
+    app: {{ $app }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
@@ -12,10 +15,34 @@ spec:
   template:
     metadata:
       labels:
-        resource: {{ .Values.resource.name }}
+        app: {{ .Values.resource.name }}
+        resource: {{ $app }}
     spec:
+{{- if $spec.nodeSelector }}
+      nodeSelector:
+{{ toYaml $spec.nodeSelector | indent 8 }}
+{{ end -}}
+{{- if $spec.tolerations }}
+      tolerations:
+{{ toYaml $spec.tolerations | indent 8 }}
+{{ end }}
       containers:
-      - name: hello
-        image: {{ .Values.image }}
-        ports:
-        - containerPort: 80
+        - name: jira
+{{- with $spec.image }}
+          image: {{ .name }}:{{ if .variant }}{{ .variant }}{{ end }}{{ if .tag }}.{{ .tag }}{{ end }}{{ if eq ( printf "%s%s" .variant .tag ) "" }}latest{{ end }}{{ if .language }}.{{ .language }}{{ end }}
+          imagePullPolicy: {{ .pullPolicy }}{{ end }}
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - mountPath: /var/atlassian/jira
+              name: jira-home
+          envFrom:
+            - secretRef:
+                name: {{ $app }}-database-credentials
+          resources:
+{{ toYaml $spec.resources | indent 12 }}
+      volumes:
+        - name: jira-home
+          persistentVolumeClaim:
+            claimName: {{ $app }}

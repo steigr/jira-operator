@@ -7,19 +7,25 @@
 apiVersion: app.coreos.com/v1alpha1
 kind: ClusterServiceVersion-v1
 metadata:
-  name: example-app-operator.v0.0.1
+  name: jira-operator.v0.0.1
   namespace: YOUR_NAMESPACE_HERE
 spec:
   install: 
     strategy: deployment
     spec:
       permissions:
-      - serviceAccountName: example-app-operator
+      - serviceAccountName: jira-operator
         rules:
         - apiGroups:
-          - example.com
+          - app.stei.gr
           resources:
-          - example-apps
+          - jiras
+          verbs:
+          - "*"
+        - apiGroups:
+          - database.stei.gr
+          resources:
+          - "*"
           verbs:
           - "*"
         - apiGroups:
@@ -27,7 +33,11 @@ spec:
           resources:
           - pods
           - events
+          - secrets
+          - services
+          - configmaps
           - namespaces
+          - persistentvolumeclaims
           verbs:
           - "*"
         - apiGroups:
@@ -41,19 +51,20 @@ spec:
           - extensions
           resources:
           - deployments
+          - ingresses
           verbs:
           - "*"
       deployments: 
-      - name: example-app-operator
+      - name: jira-operator
         spec:
           replicas: 1
           selector:
             matchLabels:
-              app: example-app-operator
+              app: jira-operator
           template:
             metadata:
               labels:
-                app: example-app-operator
+                app: jira-operator
             spec:
               containers:
                 - name: sao
@@ -64,14 +75,14 @@ spec:
                   imagePullPolicy: Always
               restartPolicy: Always
               terminationGracePeriodSeconds: 5
-              serviceAccountName: example-app-operator
-              serviceAccount: example-app-operator
+              serviceAccountName: jira-operator
+              serviceAccount: jira-operator
   customresourcedefinitions:
     owned:
-      - description: Represents a cluster of example apps
-        displayName: Example App
-        kind: ExampleApp
-        name: example-apps.example.com
+      - description: Jira
+        displayName: Atlassian JIRA
+        kind: Jira
+        name: jiras.app.stei.gr
         version: v1alpha1
         resources:
           - kind: Deployment
@@ -80,12 +91,16 @@ spec:
             version: v1beta2
           - kind: Pod
             version: v1
-        specDescriptors:
-          - description: The desired number of member Pods for the deployment.
-            displayName: Size
-            path: size
-            x-descriptors:
-              - 'urn:alm:descriptor:com.tectonic.ui:podCount'
+          - kind: Ingress
+            version: v1beta1
+          - kind: Service
+            version: v1
+          - kind: ConfigMap
+            version: v1
+          - kind: Secret
+            version: v1
+          - kind: PersistentVolumeClaim
+            version: v1
         statusDescriptors:
           - description: The current status of the application.
             displayName: Status
@@ -98,18 +113,32 @@ spec:
             x-descriptors:
               - 'urn:alm:descriptor:io.kubernetes.phase:reason'
   keywords:
-    - example
-    - app
-  displayName: Example Application
+    - jira
+    - atlassian
+    - agile
+  displayName: Atlassian JIRA
   provider:
-    name: Example Corp
-    url: www.example.com
+    name: steigr
+    url: stei.gr/operator/jira
+  icon:
+    - base64data: >-
+        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        
+  links:
+    - name: Project Homepage
+      url: https://atlassian.com/software/jira
+    - name: Documentation
+      url: https://confluence.atlassian.com/alldoc/atlassian-documentation-32243719.html
+    - name: Community Forum
+      url: https://community.atlassian.com/t5/Jira/ct-p/jira
+    - name: JIRA Core Blog
+      url: https://www.atlassian.com/blog/jira-core
   maturity: alpha
   version: 0.0.1
   maintainers:
-    - email: corp@example.com
-      name: Some Corp
-  description: Main enterprise application providing business critical features with high availabilty and no manual intervention.
+    - email: me@stei.gr
+      name: steigr
+  description: JIRA development tool
   labels:
-    alm-owner-enterprise-app: example-app-operator
-    alm-status-descriptors: example-app-operator.v0.0.1
+    alm-owner-enterprise-app: jira-operator
+    alm-status-descriptors: jira-operator.v0.0.1
+

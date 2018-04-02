@@ -1,0 +1,25 @@
+{{- $app := printf "%s-jira" .Values.resource.name -}}
+{{- $spec := dict }}
+{{- $_ := merge $spec .Values.resource.spec .Values.default -}}
+{{- if eq $spec.database.type "postgres" -}}
+apiVersion: database.stei.gr/v1alpha1
+kind: Postgres
+metadata:
+  name: {{ $app }}
+  labels:
+    app: {{ .Values.resource.name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  username: {{ default $app $spec.database.username }}
+  password: {{ default $app $spec.database.password }}
+  database: {{ default $app $spec.database.name }}
+  secrets:
+    - name: {{ $app }}-database-credentials
+      variables:
+        - name: JIRA_DATABASE_URL
+          format: "postgresql://%u@%h:%P/%d"
+        - name: JIRA_DB_PASSWORD
+          format: "%p"
+{{- end -}}

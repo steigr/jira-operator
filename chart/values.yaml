@@ -1,1 +1,25 @@
-image: nginx
+default:
+  storage:
+    size: 2Gi
+    class: ""
+  resources:
+    limits:
+      memory: 2048Mi
+      cpu: 2000m
+    requests:
+      memory: 768Mi
+      cpu: 100m
+  image:
+    name: docker.io/blacklabelops/jira
+    variant: ""
+    language: ""
+    tag: ""
+    pullPolicy: Always
+  ingress:
+    enabled: true
+    hostname: jira.example.com
+    startup: passthrough
+    annotations: {}
+  database:
+    type: postgres
+    password: changeme
