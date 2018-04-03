@@ -133,7 +133,7 @@ spec:
     - name: JIRA Core Blog
       url: https://www.atlassian.com/blog/jira-core
   maturity: alpha
-  version: YOUR_VERSION_HERE
+  version: YOUR_SEM_VERSION_HERE
   maintainers:
     - email: me@stei.gr
       name: steigr

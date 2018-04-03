@@ -62,6 +62,10 @@ spec:
         backend:
           serviceName: {{ $app }}
           servicePort: http
+      - path: /secure/errors.jsp
+        backend:
+          serviceName: {{ $app }}
+          servicePort: http
       - path: /secure/SetupDatabase.jspa
         backend:
           serviceName: {{ $app }}
@@ -70,7 +74,7 @@ spec:
         backend:
           serviceName: {{ $app }}
           servicePort: http
-      - path: /secure/errors.jsp
+      - path: /secure/SetupApplicationProperties.jspa
         backend:
           serviceName: {{ $app }}
           servicePort: http

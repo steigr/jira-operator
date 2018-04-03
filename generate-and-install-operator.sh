@@ -34,6 +34,7 @@ sed -i.bak "s/YOUR_NAMESPACE_HERE/${namespace}/g" *.yaml
 sed -i.bak "s/YOUR_REPO_IMAGE_HERE/${repository//\//\\/}/g" *.yaml
 sed -i.bak "s/YOUR_PREFIX_HERE/${prefix}/g" *.yaml
 sed -i.bak "s/YOUR_VERSION_HERE/${version}/g" *.yaml
+sed -i.bak "s/YOUR_SEM_VERSION_HERE/${version##v}/g" *.yaml
 
 # Build and push
 echo "Building and pushing stateless app operator"
