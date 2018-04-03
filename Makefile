@@ -1,12 +1,12 @@
 NAMESPACE  ?= default
 REPOSITORY ?= quay.io/steigr/jira-operator
 PREFIX     ?= jira
-TAG        ?= $(shell git rev-parse HEAD)
 
 all: release
 	@true
+
 release:
-	./generate-and-install-operator.sh "$(NAMESPACE)" "$(REPOSITORY)" "$(TAG)" "$(PREFIX)"
+	./generate-and-install-operator.sh "$(NAMESPACE)" "$(REPOSITORY)" "$(shell git describe --tags)" "$(PREFIX)"
 
 logo:
 	curl -L https://wac-cdn.atlassian.com/dam/jcr:e0cedee5-a180-40ad-b7c3-a66d6e60f483/jira-app-adg3.svg -o logo.svg
