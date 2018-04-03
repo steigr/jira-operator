@@ -23,3 +23,11 @@ default:
   database:
     type: postgres
     password: changeme
+  crowd:
+  # enabled: true
+  # application: foo
+  # password: bar
+  # url: https://crowd.example.com:8095/crowd
+    validationinterval: 0
+  sso:
+    authenticator: midan
