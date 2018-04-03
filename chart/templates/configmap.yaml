@@ -1,0 +1,32 @@
+{{- $app := printf "%s-jira" .Values.resource.name -}}
+{{- $spec := dict }}
+{{- $_ := merge $spec .Values.resource.spec .Values.default -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $app }}
+  labels:
+    app: {{ $app }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+{{ if $spec.sso.authenticator }}
+  JIRA_CROWD_SSO: {{ $spec.sso.authenticator | quote }}
+{{ end }}
+{{ if $spec.ingress.tls }}
+  JIRA_PROXY_SECURE: "true"
+  JIRA_PROXY_SCHEME: "https"
+  JIRA_PROXY_PORT: "443"
+  JIRA_URL: "https://{{ $spec.ingress.hostname }}"
+{{ else }}
+  JIRA_PROXY_PORT: "80"
+  JIRA_URL: "http://{{ $spec.ingress.hostname }}"
+{{ end }}
+  JIRA_PROXY_NAME: {{ $spec.ingress.hostname }}
+  CATALINA_OPTS: >-
+    -XX:+UseTransparentHugePages -XX:+AlwaysPreTouch{{ if $spec.crowd.enabled }}
+    -Dcrowd.properties=/usr/local/share/atlassian/crowd.properties{{ end }}
+  JAVA_OPTS: >-
+    -XX:+UseTransparentHugePages -XX:+AlwaysPreTouch{{ if $spec.crowd.enabled }}
+    -Dcrowd.properties=/usr/local/share/atlassian/crowd.properties{{ end }}
