@@ -40,9 +40,43 @@ spec:
           envFrom:
             - secretRef:
                 name: {{ $app }}-database-credentials
+            - configMapRef:
+                name: {{ $app }}
+          volumeMounts:
+            - name: jira-home
+              mountPath: /var/atlassian/jira
+            - name: docker-entrypoint
+              mountPath: /usr/local/share/atlassian/docker-entrypoint.sh
+              subPath: docker-entrypoint.sh
+            {{ if $spec.crowd.enabled }}
+            - name: crowd-properties
+              mountPath: /usr/local/share/atlassian/crowd.properties
+              subPath: crowd.properties
+            {{ end }}
           resources:
 {{ toYaml $spec.resources | indent 12 }}
       volumes:
         - name: jira-home
           persistentVolumeClaim:
             claimName: {{ $app }}
+        - name: docker-entrypoint
+          secret:
+            secretName: {{ $app }}
+            items:
+              - key: docker-entrypoint.sh
+                path: docker-entrypoint.sh
+            defaultMode: 493
+{{ if $spec.crowd.enabled }}
+        - name: crowd-properties
+          secret:
+            secretName: {{ $app }}
+            items:
+              - key: crowd.properties
+                path: crowd.properties
+            defaultMode: 420
+{{ end }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
