@@ -5,7 +5,7 @@
 apiVersion: database.stei.gr/v1alpha1
 kind: Postgres
 metadata:
-  name: {{ .Values.resource.name }}
+  name: {{ $app }}
   labels:
     app: {{ .Values.resource.name }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
