@@ -70,4 +70,8 @@ spec:
         backend:
           serviceName: {{ $app }}
           servicePort: http
+      - path: /secure/errors.jsp
+        backend:
+          serviceName: {{ $app }}
+          servicePort: http
 {{ end }}
