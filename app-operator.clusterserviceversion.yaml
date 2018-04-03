@@ -7,7 +7,7 @@
 apiVersion: app.coreos.com/v1alpha1
 kind: ClusterServiceVersion-v1
 metadata:
-  name: jira-operator.v0.0.1
+  name: jira-operator.YOUR_VERSION_HERE
   namespace: YOUR_NAMESPACE_HERE
 spec:
   install: 
@@ -68,7 +68,7 @@ spec:
             spec:
               containers:
                 - name: sao
-                  image: YOUR_REPO_IMAGE_HERE
+                  image: YOUR_REPO_IMAGE_HERE:YOUR_VERSION_HERE
                   ports:
                     - containerPort: 8080
                       protocol: TCP
@@ -133,12 +133,12 @@ spec:
     - name: JIRA Core Blog
       url: https://www.atlassian.com/blog/jira-core
   maturity: alpha
-  version: 0.0.1
+  version: YOUR_VERSION_HERE
   maintainers:
     - email: me@stei.gr
       name: steigr
   description: JIRA development tool
   labels:
     alm-owner-enterprise-app: jira-operator
-    alm-status-descriptors: jira-operator.v0.0.1
+    alm-status-descriptors: jira-operator.YOUR_VERSION_HERE
 
